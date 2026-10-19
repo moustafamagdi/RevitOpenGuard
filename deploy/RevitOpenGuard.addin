@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Revit Open Guard</Name>
+    <Assembly>__ASSEMBLY_PATH__</Assembly>
+    <AddInId>57972529-0CBC-426B-AFA1-28F59AD19B6E</AddInId>
+    <FullClassName>RevitOpenGuard.App</FullClassName>
+    <VendorId>MMGD</VendorId>
+    <VendorDescription>Mostafa Magdy - BIM Automation</VendorDescription>
+  </AddIn>
+</RevitAddIns>

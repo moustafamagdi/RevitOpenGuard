@@ -1,0 +1,16 @@
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.log
+*.tmp
+*.bak
+TestResults/
+artifacts/
+# Never commit Autodesk binaries or project data.
+RevitAPI*.dll
+*.rvt
+*.rfa
+*.nwc
+settings.xml
