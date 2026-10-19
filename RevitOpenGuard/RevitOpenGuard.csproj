@@ -27,8 +27,8 @@
     <RevitApiVersion Condition="$(RevitYear) == 2027">2027.0.0</RevitApiVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(RevitInstallPath)' != ''">
-    <Reference Include="RevitAPI"><HintPath>$(RevitInstallPath)\RevitAPI.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="RevitAPIUI"><HintPath>$(RevitInstallPath)\RevitAPIUI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="RevitAPI"><HintPath>$(RevitInstallPath)\RevitAPI.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="RevitAPIUI"><HintPath>$(RevitInstallPath)\RevitAPIUI.dll</HintPath><Private>False</Private></Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(RevitInstallPath)' == ''">
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitApiVersion)" IncludeAssets="compile" PrivateAssets="all" />
