@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minToolVersion": "0.2.0",
-  "notes": "Revit 2024 (English): recover the opening failure \"One or more dimension references are or have become invalid.\" using DeleteElements when permitted by Revit. This narrow rule precedes the generic broken-reference DetachElements fallback. Other rules and Revit years are unchanged.",
+  "notes": "Update notification test release. Recovery rules are unchanged from catalog 1.0.1. Choose Update error catalog to verify that catalog updates are detected and applied.",
   "rules": [
     {
       "id": "Text.InvalidDimensionReferences.DeleteDimensions",
