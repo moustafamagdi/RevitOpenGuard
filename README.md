@@ -12,7 +12,7 @@ The service remains registered for the Revit session, but only acts during an ob
 
 **ON authorizes the listed recovery actions, including removing invalid annotation references and deleting invalid dimensions when Revit permits the resolution. These changes affect the document in memory and may be saved when you later Save/Sync.** There are no safety modes or per-error approval dialogs. Unknown or unsupported cases keep Revit's normal prompt.
 
-## Build and install (version 0.2.1)
+## Build and install (version 0.2.2)
 
 Build all six versions with `.\scripts\Build.ps1`, then package with `.\installer\Build.ps1 -SkipBuild`. Or run `.\installer\Build.ps1` to do both. Requirements: Windows, .NET 10 SDK and the .NET Framework 4.8 targeting pack.
 
@@ -38,7 +38,9 @@ The 2025/2026 DLLs omit an application runtimeconfig, allowing the Revit host ru
 
 Use **MM Tools > Model Opening > Error Catalog Updates** to check for new rules and choose **Update**. Version 0.2.1 checks in the background on every Revit startup, even if another session checked less than 24 hours ago. Long sessions retain the daily background check. Network failures remain quiet and preserve the offline catalog. New verified versions are offered at idle, outside model openings.
 
-The notification is a standard Revit TaskDialog titled **Open Guard - Error catalog update**. It shows **A new error catalog is available: <version>**, release notes, an **Update error catalog** command and a **Close** button. The catalog is applied only if the user selects Update; closing the dialog leaves the current catalog unchanged. This check schedule is a DLL behavior change and requires installing version 0.2.1; it cannot be delivered through a rules-only JSON update.
+The notification is a standard Revit TaskDialog titled **Open Guard - Error catalog update**. It shows **A new error catalog is available: <version>**, release notes, an **Update error catalog** command and a **Close** button. The catalog is applied only if the user selects Update; closing the dialog leaves the current catalog unchanged. This check schedule is a DLL behavior change and requires installing version 0.2.1 or later; it cannot be delivered through a rules-only JSON update.
+
+Version 0.2.2 explicitly signals a Revit ExternalEvent when the background check completes, retaining Idling as a fallback. Notifications wait until model opening and any manual update window have finished. Each HTTP check uses no-cache/no-store headers plus a unique request URL to avoid reusing a pre-publication feed response. Local logs record remote/local versions, notification delivery and the user's apply/defer choice. These changes address a reported missing startup notification in 0.2.1; the exact earlier response was not logged, so stale feed data versus a delayed UI callback could not be distinguished retrospectively.
 
 The [live feed](https://github.com/moustafamagdi/RevitOpenGuard/tree/catalog-updates) is independent of add-in binaries. The client verifies an RSA/SHA-256 signature against its embedded public key, validates the schema and action allowlist, rejects downgrades and catalogs requiring a newer tool, then atomically saves a local snapshot and signed backup. Failed or corrupt downloads cannot replace working rules. An invalid cache falls back to a valid backup or embedded baseline. No executable code is downloaded.
 
@@ -85,3 +87,5 @@ All six Release builds compile against their year-specific API references. Catal
 The installer self-test checks all six payloads, their Revit API major versions, absolute manifest paths published last, reinstall/update with a locked old DLL, rollback before publication, uninstall and unrelated-file preservation. It does not install into real Revit directories or register an installed-app entry.
 
 **Actual model-opening integration inside Revit 2022-2027 has not been tested for this change.** Follow [the validation checklist](docs/VALIDATION.md) in each host, including the 2025.5/2026.5 .NET migration updates, before treating it as runtime-validated. The Windows setup EXE is unsigned; downloaded catalogs carry their separate developer signature.
+
+Run `.\scripts\Test-Notifications.ps1 -Online` for keyless notification/HTTP regression tests. These link the production coordinator and catalog verifier with a simulated Revit UI event queue. They cover startup despite a recent timestamp, completion signaling, no automatic apply, manual-window/opening guards, quiet failure, shutdown, cache bypass and live HTTPS verification. They do not prove actual Revit notification delivery; that still needs a host check.

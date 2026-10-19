@@ -77,9 +77,9 @@ namespace RevitOpenGuard.Runtime
         private void LogStartup(string version, string build)
         {
             CatalogStore.RevitYear = int.Parse(version, CultureInfo.InvariantCulture);
-            _log.Write("INFO", "Startup", "Version=0.2.1; Revit=" + version + "; Build=" + build + "; Enabled=" + Enabled
+            _log.Write("INFO", "Startup", "Version=0.2.2; Revit=" + version + "; Build=" + build + "; Enabled=" + Enabled
                 + "; Catalog=" + CatalogStore.Current.Version + "; Settings=" + _settings.FilePath + "; Log=" + _log.CurrentPath);
-            CatalogUpdateNotice.Start();
+            CatalogUpdateNotice.Start(_log);
         }
 
         public bool Toggle(out string persistenceError)
@@ -301,6 +301,7 @@ namespace RevitOpenGuard.Runtime
         {
             if (IsDisposed) return;
             IsDisposed = true;
+            CatalogUpdateNotice.Stop();
             try { _unsubscribe?.Invoke(); }
             catch (Exception ex) { _log.Write("WARN", "Shutdown", "Could not remove all subscriptions.", error: ex); }
             _unsubscribe = null;

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 [assembly: AssemblyTitle("Revit Open Guard Setup")]
 [assembly: AssemblyCompany("Mostafa Magdy")]
-[assembly: AssemblyVersion("0.2.1.0")]
+[assembly: AssemblyVersion("0.2.2.0")]
 namespace RevitOpenGuard.Setup {
 static class Program {
  internal static readonly int[] Years = {2022,2023,2024,2025,2026,2027};
@@ -67,7 +67,7 @@ static class Program {
    string setup=Path.Combine(setupFolder,"RevitOpenGuardSetup.exe");
    if(!String.Equals(setup,Assembly.GetExecutingAssembly().Location,StringComparison.OrdinalIgnoreCase)) write(setup,File.ReadAllBytes(Assembly.GetExecutingAssembly().Location));
    if(register) using(var key=Registry.CurrentUser.CreateSubKey(Key)) {
-    key.SetValue("DisplayName","Revit Open Guard (2022-2027)"); key.SetValue("DisplayVersion","0.2.1");
+    key.SetValue("DisplayName","Revit Open Guard (2022-2027)"); key.SetValue("DisplayVersion","0.2.2");
     key.SetValue("Publisher","Mostafa Magdy"); key.SetValue("InstallLocation",setupFolder); key.SetValue("DisplayIcon",setup);
     key.SetValue("UninstallString","\""+setup+"\" /uninstall");
     key.SetValue("NoModify",1,RegistryValueKind.DWord); key.SetValue("NoRepair",1,RegistryValueKind.DWord);

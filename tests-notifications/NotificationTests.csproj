@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType><TargetFrameworks>net48;net8.0-windows;net10.0-windows</TargetFrameworks><Nullable>enable</Nullable><LangVersion>latest</LangVersion><ImplicitUsings>disable</ImplicitUsings></PropertyGroup>
+ <ItemGroup>
+  <Compile Include="..\RevitOpenGuard\CatalogUpdateNotice.cs" Link="CatalogUpdateNotice.cs" />
+  <Compile Include="..\RevitOpenGuard\Policies\Catalog.cs" Link="Catalog.cs" />
+  <Compile Include="..\RevitOpenGuard\Infrastructure\CatalogStore.cs" Link="CatalogStore.cs" />
+  <EmbeddedResource Include="..\catalog\catalog.json" LogicalName="OpenGuard.Catalog" />
+  <EmbeddedResource Include="..\catalog\public-key.xml" LogicalName="OpenGuard.PublicKey" />
+  <None Update="fixtures\catalog-1.0.2.signed.json" CopyToOutputDirectory="PreserveNewest" />
+ </ItemGroup>
+ <ItemGroup Condition="'$(TargetFramework)'=='net48'"><Reference Include="System.Runtime.Serialization" /><Reference Include="System.Net.Http" /></ItemGroup>
+</Project>

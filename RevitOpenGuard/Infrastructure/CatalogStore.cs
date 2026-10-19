@@ -68,29 +68,38 @@ namespace RevitOpenGuard.Infrastructure
             var catalog = Catalog.Read<Catalog>(payload); catalog.Validate(); return catalog;
         }
 
-        internal static async Task<byte[]?> CheckAsync(HttpMessageHandler? transport = null)
+        internal static async Task<byte[]?> CheckAsync(HttpMessageHandler? transport = null, Action<string>? trace = null)
         {
             // Never call the Revit API from this background operation.
             using (var handler = transport ?? new HttpClientHandler { AllowAutoRedirect = false })
             using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(20) })
             using (var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(20)))
-            using (var response = await client.GetAsync(FeedUrl, HttpCompletionOption.ResponseHeadersRead, cancellation.Token).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                if (response.Content.Headers.ContentLength > MaxBytes) throw new InvalidDataException("Catalog exceeds the size limit.");
-                using (var input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                using (var memory = new MemoryStream())
+                client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue { NoCache = true, NoStore = true };
+                client.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
+                // A unique request URL also bypasses shared/CDN cache entries created before publication.
+                string requestUrl = FeedUrl + "?check=" + Guid.NewGuid().ToString("N");
+                using (var response = await client.GetAsync(requestUrl, HttpCompletionOption.ResponseHeadersRead, cancellation.Token).ConfigureAwait(false))
                 {
-                    var buffer = new byte[8192]; int read;
-                    while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancellation.Token).ConfigureAwait(false)) > 0)
+                    response.EnsureSuccessStatusCode();
+                    if (response.Content.Headers.ContentLength > MaxBytes) throw new InvalidDataException("Catalog exceeds the size limit.");
+                    using (var input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                    using (var memory = new MemoryStream())
                     {
-                        if (memory.Length + read > MaxBytes) throw new InvalidDataException("Catalog exceeds the size limit.");
-                        memory.Write(buffer, 0, read);
+                        var buffer = new byte[8192]; int read;
+                        while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancellation.Token).ConfigureAwait(false)) > 0)
+                        {
+                            if (memory.Length + read > MaxBytes) throw new InvalidDataException("Catalog exceeds the size limit.");
+                            memory.Write(buffer, 0, read);
+                        }
+                        byte[] bytes = memory.ToArray(); var candidate = Verify(bytes);
+                        Directory.CreateDirectory(StorageDirectory);
+                        File.WriteAllText(LastCheck, DateTime.UtcNow.ToString("O"));
+                        string localVersion = Current.Version;
+                        bool newer = new Version(candidate.Version) > new Version(localVersion);
+                        trace?.Invoke("Remote=" + candidate.Version + "; Local=" + localVersion + "; UpdateAvailable=" + newer);
+                        return newer ? bytes : null;
                     }
-                    byte[] bytes = memory.ToArray(); var candidate = Verify(bytes);
-                    Directory.CreateDirectory(StorageDirectory);
-                    File.WriteAllText(LastCheck, DateTime.UtcNow.ToString("O"));
-                    return new Version(candidate.Version) > new Version(Current.Version) ? bytes : null;
                 }
             }
         }

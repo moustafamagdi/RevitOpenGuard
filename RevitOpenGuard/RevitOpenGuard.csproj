@@ -15,8 +15,8 @@
     <RootNamespace>RevitOpenGuard</RootNamespace>
     <PlatformTarget>x64</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <Version>0.2.1</Version>
-    <AssemblyVersion>0.2.$(RevitYear).1</AssemblyVersion>
+    <Version>0.2.2</Version>
+    <AssemblyVersion>0.2.$(RevitYear).2</AssemblyVersion>
     <Authors>Mostafa Magdy</Authors>
     <Description>Opening-scoped handling of known Revit dialogs and recoverable failures.</Description>
     <RevitApiVersion Condition="$(RevitYear) == 2022">2022.1.1</RevitApiVersion>

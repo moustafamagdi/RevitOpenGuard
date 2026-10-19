@@ -19,59 +19,6 @@ namespace RevitOpenGuard
         }
     }
 
-    internal static class CatalogUpdateNotice
-    {
-        private static Task<byte[]?>? _check;
-        private static bool _started;
-        private static DateTime _lastAttempt = DateTime.MinValue;
-        internal static bool WindowOpen;
-        private static void BeginCheck()
-        {
-            _lastAttempt = DateTime.UtcNow;
-            _check = Task.Run(() => CatalogStore.CheckAsync());
-        }
-        internal static void Start()
-        {
-            if (_started) return;
-            _started = true;
-            // Each Revit process checks once at startup, regardless of the shared last-check timestamp.
-            BeginCheck();
-        }
-
-        internal static void OnIdle()
-        {
-            if (WindowOpen) return;
-            if (_check == null)
-            {
-                if (DateTime.UtcNow - _lastAttempt > TimeSpan.FromDays(1) && CatalogStore.CheckDue) BeginCheck();
-                return;
-            }
-            if (!_check.IsCompleted) return;
-            var result = _check; _check = null;
-            if (result.IsFaulted)
-            {
-                new AuditLog().Write("WARN", "CatalogCheck", "Using the saved offline catalog.", error: result.Exception);
-                return;
-            }
-            if (result.IsCanceled || result.Result == null) return;
-            byte[] bytes = result.Result;
-            var candidate = CatalogStore.Verify(bytes);
-            if (new Version(candidate.Version) <= new Version(CatalogStore.Current.Version)) return;
-            var dialog = new TaskDialog("Open Guard - Error catalog update")
-            {
-                MainInstruction = "A new error catalog is available: " + candidate.Version,
-                MainContent = candidate.Notes,
-                CommonButtons = TaskDialogCommonButtons.Close
-            };
-            dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Update error catalog");
-            if (dialog.Show() == TaskDialogResult.CommandLink1)
-            {
-                try { CatalogStore.Apply(bytes); }
-                catch (Exception ex) { TaskDialog.Show("Open Guard", "Catalog could not be updated. The previous catalog is still active.\n" + ex.Message); }
-            }
-        }
-    }
-
     internal sealed class CatalogUpdateWindow : System.Windows.Window
     {
         private readonly System.Windows.Controls.TextBlock _status;
@@ -83,7 +30,7 @@ namespace RevitOpenGuard
         {
             _opening = opening;
             CatalogUpdateNotice.WindowOpen = true;
-            Closed += (sender, args) => CatalogUpdateNotice.WindowOpen = false;
+            Closed += (sender, args) => { CatalogUpdateNotice.WindowOpen = false; CatalogUpdateNotice.RequestNotification(); };
             Title = "MM Tools | Open Guard error catalog"; Width = 540; Height = 340;
             ResizeMode = System.Windows.ResizeMode.NoResize;
             WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
@@ -104,7 +51,7 @@ namespace RevitOpenGuard
                 _status.Text = "Checking for updates...";
                 try
                 {
-                    _pending = await CatalogStore.CheckAsync();
+                    _pending = await CatalogStore.CheckAsync(trace: details => CatalogUpdateNotice.Trace("Manual; " + details));
                     if (_pending == null) _status.Text = "Your error catalog is up to date.\nVersion: " + CatalogStore.Current.Version;
                     else
                     {
