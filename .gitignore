@@ -14,3 +14,5 @@ RevitAPI*.dll
 *.rfa
 *.nwc
 settings.xml
+
+installer/dist/

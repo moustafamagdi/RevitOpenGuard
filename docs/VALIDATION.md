@@ -18,3 +18,7 @@ Initial implementation: code review only, not a claimed successful Revit build/r
 For a new blocker, capture the screenshot plus matching log lines. A dialog before DocumentOpening or after DocumentOpened is outside this version's scope; do not broaden to whole-session auto-clicking to work around it.
 
 The source project should not be distributed as a tested binary until steps 1-10 pass on a real Revit 2024 installation.
+
+## Version 0.2.0 host matrix
+
+Repeat opening, ON/OFF and unknown-dialog checks in Revit 2022 through 2027, including 2025.5/2026.5. Check initial installation while Revit is open, catalog notification, manual download/apply, offline startup and rule snapshot stability during opening. Compile/package tests do not establish host runtime validation.

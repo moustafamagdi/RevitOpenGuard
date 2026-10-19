@@ -68,6 +68,13 @@ namespace RevitOpenGuard
                 };
                 _button = panel.AddItem(data) as PushButton;
             }
+            if (!panel.GetItems().Any(item => item.Name == "RevitOpenGuard.Catalog"))
+                panel.AddItem(new PushButtonData("RevitOpenGuard.Catalog", "Error Catalog\nUpdates",
+                    Assembly.GetExecutingAssembly().Location, typeof(CatalogUpdatesCommand).FullName)
+                {
+                    AvailabilityClassName = typeof(ToggleAvailability).FullName,
+                    ToolTip = "Check for and download signed error-catalog updates."
+                });
         }
 
         private static void OnStateChanged(object? sender, EventArgs e) => RefreshButton();
