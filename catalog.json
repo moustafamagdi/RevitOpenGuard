@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "minToolVersion": "0.2.0",
+  "notes": "Initial portable opening-recovery catalog for Revit 2022-2027.",
+  "rules": [
+    {"id":"Dimension.LinearConstraintNotParallel","kind":"Failure","failureId":"BuiltIn:LinearConstraintNotParallel","action":"DetachElements","minRevit":2022,"maxRevit":2027},
+    {"id":"Dimension.RadialDimensionCannotProjectToArc","kind":"Failure","failureId":"BuiltIn:RadialDimensionCannotProjectToArc","action":"DeleteElements","minRevit":2022,"maxRevit":2027},
+    {"id":"Dimension.DimensionPerpendicularToView","kind":"Failure","failureId":"BuiltIn:DimensionPerpendicularToView","action":"DeleteElements","minRevit":2022,"maxRevit":2027},
+    {"id":"Text.InvalidRadialDimension","kind":"Failure","anyText":["cannot form radial dimension","can't form radial dimension"],"action":"DeleteElements","minRevit":2022,"maxRevit":2027},
+    {"id":"Text.PerpendicularDimension","kind":"Failure","allText":["dimension is perpendicular to the current view","no longer valid"],"action":"DeleteElements","minRevit":2022,"maxRevit":2027},
+    {"id":"Text.BrokenAnnotationReference","kind":"Failure","anyText":["reference is no longer","references are no longer","reference is missing","references are missing","missing reference","lost reference","invalid reference","references to elements have been lost","references are or have become invalid"],"action":"DetachElements","minRevit":2022,"maxRevit":2027},
+    {"id":"Text.NonParallelDimension","kind":"Failure","allText":["dimension","no longer parallel"],"action":"DetachElements","minRevit":2022,"maxRevit":2027},
+    {"id":"CAD.EmptyPaperSpace","kind":"Dialog","dialogKind":"Any","allText":["import detected no valid elements in the file's paper space","import from the model space"],"action":"Yes","minRevit":2022,"maxRevit":2027},
+    {"id":"CAD.TruncatedNumericalData.Task","kind":"Dialog","dialogKind":"TaskDialog","allText":["some numerical data within the imported file was out of range","this numerical data has been truncated"],"action":"Close","minRevit":2022,"maxRevit":2027},
+    {"id":"CAD.TruncatedNumericalData.Message","kind":"Dialog","dialogKind":"MessageBox","allText":["some numerical data within the imported file was out of range","this numerical data has been truncated"],"action":"Ok","minRevit":2022,"maxRevit":2027},
+    {"id":"CAD.GeometryWarning","kind":"Dialog","dialogKind":"Any","anyText":["far from the origin","large coordinate","extents are greater","geometry extents","imported geometry","slightly off axis"],"action":"Ok","minRevit":2022,"maxRevit":2027},
+    {"id":"Annotation.ReferenceRecoveryCommand","kind":"Dialog","dialogKind":"TaskDialog","anyText":["missing reference","references are missing","reference is missing","lost references","invalid references","dimension references","tag references","references to elements have been lost"],"action":"CommandLink1","minRevit":2022,"maxRevit":2027},
+    {"id":"Opening.LoadDisplayNotice","kind":"Dialog","dialogKind":"TaskDialog","anyText":["cannot be displayed","could not be loaded","failed to load","some elements were deleted"],"action":"Ok","minRevit":2022,"maxRevit":2027}
+  ]
+}
