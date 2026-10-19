@@ -34,7 +34,8 @@ namespace RevitOpenGuard
         {
             if (_started) return;
             _started = true;
-            if (CatalogStore.CheckDue) BeginCheck();
+            // Each Revit process checks once at startup, regardless of the shared last-check timestamp.
+            BeginCheck();
         }
 
         internal static void OnIdle()

@@ -13,7 +13,7 @@ The independent `catalog-updates` branch contains only feed data. Publishing doe
 3. Run `.\scripts\Publish-Catalog.ps1` to sign locally. The supplied private key must match the embedded public key.
 4. Run `.\scripts\Test-Catalog.ps1`. Model-specific rules also need a real Revit check. The test executable supports `--verify <signed-file>` to validate a file without applying it.
 5. Run `.\scripts\Publish-Catalog.ps1 -Publish`. This validates the signed catalog using the client validator, requires a version increase relative to the current feed, then pushes only catalog data to `catalog-updates` from a temporary independent checkout. It uses your configured Git identity and authentication. It does not force-push; concurrent updates are rejected for retry.
-6. Users receive the update on their next due daily check, or through **Error Catalog Updates > Check for updates > Update**. Rules using supported actions need no new DLL or restart; a new snapshot applies to subsequent model openings.
+6. With add-in 0.2.1, users are checked on every Revit startup, with daily rechecks during long sessions; 0.2.0 uses the earlier daily startup gate. Manual checks remain available through **Error Catalog Updates > Check for updates > Update**. Rules using supported actions need no new DLL or restart; a new snapshot applies to subsequent model openings. Checks offer the update in a Revit TaskDialog; the user must select **Update error catalog** to apply it.
 
 Withdraw a bad rule by publishing a higher version that corrects/removes it. Clients do not accept a lower version. GitHub raw caching can delay visibility briefly.
 

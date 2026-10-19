@@ -12,7 +12,7 @@ The service remains registered for the Revit session, but only acts during an ob
 
 **ON authorizes the listed recovery actions, including removing invalid annotation references and deleting invalid dimensions when Revit permits the resolution. These changes affect the document in memory and may be saved when you later Save/Sync.** There are no safety modes or per-error approval dialogs. Unknown or unsupported cases keep Revit's normal prompt.
 
-## Build and install (version 0.2.0)
+## Build and install (version 0.2.1)
 
 Build all six versions with `.\scripts\Build.ps1`, then package with `.\installer\Build.ps1 -SkipBuild`. Or run `.\installer\Build.ps1` to do both. Requirements: Windows, .NET 10 SDK and the .NET Framework 4.8 targeting pack.
 
@@ -36,7 +36,9 @@ The 2025/2026 DLLs omit an application runtimeconfig, allowing the Revit host ru
 
 ## Error catalog updates
 
-Use **MM Tools > Model Opening > Error Catalog Updates** to check for new rules and choose **Update**. The tool also checks in the background when the last successful check is older than a day, including during long sessions. Network failures remain quiet and preserve the offline catalog. New verified versions are offered at idle, outside model openings.
+Use **MM Tools > Model Opening > Error Catalog Updates** to check for new rules and choose **Update**. Version 0.2.1 checks in the background on every Revit startup, even if another session checked less than 24 hours ago. Long sessions retain the daily background check. Network failures remain quiet and preserve the offline catalog. New verified versions are offered at idle, outside model openings.
+
+The notification is a standard Revit TaskDialog titled **Open Guard - Error catalog update**. It shows **A new error catalog is available: <version>**, release notes, an **Update error catalog** command and a **Close** button. The catalog is applied only if the user selects Update; closing the dialog leaves the current catalog unchanged. This check schedule is a DLL behavior change and requires installing version 0.2.1; it cannot be delivered through a rules-only JSON update.
 
 The [live feed](https://github.com/moustafamagdi/RevitOpenGuard/tree/catalog-updates) is independent of add-in binaries. The client verifies an RSA/SHA-256 signature against its embedded public key, validates the schema and action allowlist, rejects downgrades and catalogs requiring a newer tool, then atomically saves a local snapshot and signed backup. Failed or corrupt downloads cannot replace working rules. An invalid cache falls back to a valid backup or embedded baseline. No executable code is downloaded.
 

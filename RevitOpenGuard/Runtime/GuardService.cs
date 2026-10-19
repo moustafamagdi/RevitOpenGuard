@@ -77,7 +77,7 @@ namespace RevitOpenGuard.Runtime
         private void LogStartup(string version, string build)
         {
             CatalogStore.RevitYear = int.Parse(version, CultureInfo.InvariantCulture);
-            _log.Write("INFO", "Startup", "Version=0.2.0; Revit=" + version + "; Build=" + build + "; Enabled=" + Enabled
+            _log.Write("INFO", "Startup", "Version=0.2.1; Revit=" + version + "; Build=" + build + "; Enabled=" + Enabled
                 + "; Catalog=" + CatalogStore.Current.Version + "; Settings=" + _settings.FilePath + "; Log=" + _log.CurrentPath);
             CatalogUpdateNotice.Start();
         }
