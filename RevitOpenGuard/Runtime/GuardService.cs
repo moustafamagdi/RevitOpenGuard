@@ -74,9 +74,13 @@ namespace RevitOpenGuard.Runtime
             LogStartup(database.VersionNumber, database.VersionBuild);
         }
 
-        private void LogStartup(string version, string build) => _log.Write("INFO", "Startup",
-            "Version=0.1.0; Revit=" + version + "; Build=" + build + "; Enabled=" + Enabled
-            + "; Settings=" + _settings.FilePath + "; Log=" + _log.CurrentPath);
+        private void LogStartup(string version, string build)
+        {
+            CatalogStore.RevitYear = int.Parse(version, CultureInfo.InvariantCulture);
+            _log.Write("INFO", "Startup", "Version=0.2.2; Revit=" + version + "; Build=" + build + "; Enabled=" + Enabled
+                + "; Catalog=" + CatalogStore.Current.Version + "; Settings=" + _settings.FilePath + "; Log=" + _log.CurrentPath);
+            CatalogUpdateNotice.Start(_log);
+        }
 
         public bool Toggle(out string persistenceError)
         {
@@ -99,12 +103,13 @@ namespace RevitOpenGuard.Runtime
             try
             {
                 RefreshKnownDocuments();
+                if (_openings.Count == 0) CatalogStore.RefreshBetweenOpenings();
                 // Also push non-project openings, to suspend a parent scope while a family opens.
                 var scope = new OpeningScope(args.PathName ?? string.Empty,
                     args.DocumentType == DocumentType.Project, _knownDocuments);
                 _openings.Push(scope);
                 _log.Write("INFO", "OpeningStarted", "DocumentType=" + args.DocumentType
-                    + "; Protected=" + scope.IsProject, scope.Id, scope.Path);
+                    + "; Catalog=" + CatalogStore.Current.Version + "; Protected=" + scope.IsProject, scope.Id, scope.Path);
             }
             catch (Exception ex)
             {
@@ -144,6 +149,7 @@ namespace RevitOpenGuard.Runtime
             // No polling, no SetRaiseWithoutDelay, no arbitrary timeouts on long model opens.
             // Revit's normal Idling event is the fallback if an abnormal open missed its post event.
             if (_openings.Count > 0) ResetOpenings("Revit returned to interactive idle without a matching post-open event");
+            CatalogUpdateNotice.OnIdle();
         }
 
         private void RefreshKnownDocuments()
@@ -207,7 +213,7 @@ namespace RevitOpenGuard.Runtime
                     try
                     {
                         string ids = string.Join(",", failure.GetFailingElementIds()
-                            .Select(id => id.Value).OrderBy(id => id).Select(id => id.ToString(CultureInfo.InvariantCulture)));
+                            .Select(ElementIdValue).OrderBy(id => id).Select(id => id.ToString(CultureInfo.InvariantCulture)));
                         string definition = failure.GetFailureDefinitionId().Guid.ToString();
                         string description = failure.GetDescriptionText() ?? "";
                         string details = "FailureId=" + definition + "; Severity=" + failure.GetSeverity()
@@ -267,6 +273,15 @@ namespace RevitOpenGuard.Runtime
             return string.Join(",", names);
         }
 
+        private static long ElementIdValue(ElementId id)
+        {
+#if REVIT_LEGACY_IDS
+            return id.IntegerValue;
+#else
+            return id.Value;
+#endif
+        }
+
         private void Observe(OpeningScope scope, string category, string details)
         {
             if (scope.Observations.Add(category + "|" + details))
@@ -286,6 +301,7 @@ namespace RevitOpenGuard.Runtime
         {
             if (IsDisposed) return;
             IsDisposed = true;
+            CatalogUpdateNotice.Stop();
             try { _unsubscribe?.Invoke(); }
             catch (Exception ex) { _log.Write("WARN", "Shutdown", "Could not remove all subscriptions.", error: ex); }
             _unsubscribe = null;

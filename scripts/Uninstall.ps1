@@ -2,10 +2,9 @@
 param()
 $ErrorActionPreference = 'Stop'
 if (Get-Process -Name Revit -ErrorAction SilentlyContinue) { throw 'Close all Revit instances before uninstalling Open Guard.' }
-$addins = Join-Path $env:APPDATA 'Autodesk\Revit\Addins\2024'
-$folder = Join-Path $addins 'RevitOpenGuard'
-foreach ($file in @((Join-Path $addins 'RevitOpenGuard.addin'), (Join-Path $folder 'RevitOpenGuard.dll'), (Join-Path $folder 'RevitOpenGuard.pdb'))) {
-    if (Test-Path -LiteralPath $file) { Remove-Item -LiteralPath $file -Force }
+$setup = Join-Path $env:LOCALAPPDATA 'MoustafaMagdi\RevitOpenGuard\Setup\RevitOpenGuardSetup.exe'
+if (!(Test-Path -LiteralPath $setup)) {
+    $setup = Join-Path $env:APPDATA 'Autodesk\Revit\Addins\2024\RevitOpenGuard\RevitOpenGuardSetup.exe'
 }
-if ((Test-Path -LiteralPath $folder) -and @(Get-ChildItem -LiteralPath $folder -Force).Count -eq 0) { Remove-Item -LiteralPath $folder }
-Write-Host 'Open Guard uninstalled. Saved settings and logs have been preserved.'
+if (!(Test-Path -LiteralPath $setup)) { throw 'Use the setup or Windows Installed apps to remove Open Guard.' }
+& $setup /uninstall

@@ -1,89 +1,91 @@
 # Revit Open Guard
 
-**Turn it on. Open your model normally. Let Revit get past known opening blockers.**
+**Handle known blockers while opening your Revit model.**
 
-A standalone Revit 2024 add-in with one persistent **ON / OFF** ribbon button. It handles approved model-opening dialogs and recoverable annotation failures, including Remove Reference and Delete Dimension(s), without asking for confirmation on each occurrence.
+A Windows add-in with a simple **ON / OFF** button and an error catalog that can update independently of the add-in.
 
-## Using it
+## Download
 
-The button is at **MM Tools > Model Opening > Open Guard**. A first installation starts **OFF**. Click to enable; the state is remembered at the next Revit startup. Click again to disable. Open RVT models through Revit's normal workflow; no special Open command, exporter, batch manager, or additional account is required.
+### [⬇ Download the Windows Installer](https://github.com/moustafamagdi/RevitOpenGuard/releases/latest/download/Revit-Open-Guard-2022-2027-Setup.exe)
 
-The service remains registered for the Revit session, but only acts during an observed **RVT document opening**. It does not handle ordinary editing, saving, synchronizing, exporting or link reloads outside that opening scope. It never initiates Save, Save As, Sync, model closing or central-file detachment.
+**Version 0.2.2 · Revit 2022–2027 · Per-user installation · No administrator required**
 
-**ON authorizes the listed recovery actions, including removing invalid annotation references and deleting invalid dimensions when Revit permits the resolution. These changes affect the document in memory and may be saved when you later Save/Sync.** There are no safety modes or per-error approval dialogs. Unknown or unsupported cases keep Revit's normal prompt.
+[Release notes and all downloads](https://github.com/moustafamagdi/RevitOpenGuard/releases/latest) · [SHA-256 checksum](https://github.com/moustafamagdi/RevitOpenGuard/releases/latest/download/Revit-Open-Guard-2022-2027-Setup.exe.sha256)
 
-## Build in Visual Studio 2022
+Download the **Setup.exe** above to install the add-in. You do not need Visual Studio, a development SDK, or the source-code ZIP.
 
-Open `RevitOpenGuard.sln`, select **Release**, then **Rebuild Solution**. Requirements: Windows, Revit 2024, Visual Studio 2022 with .NET desktop development and the .NET Framework 4.8 targeting pack. The project targets **net48 / x64** and references `RevitAPI.dll` and `RevitAPIUI.dll` from the installed Revit directory. Autodesk DLLs are not copied into the output. There are no third-party runtime dependencies.
+## Install and start using it
 
-Default Revit path: `C:\Program Files\Autodesk\Revit 2024`.
+1. Run **Revit-Open-Guard-2022-2027-Setup.exe**.
+2. Select your Revit versions and click **Install**. Detected installations are preselected. **Revit can stay open during installation.**
+3. Open Revit. If you are updating an add-in that is already loaded, restart Revit to activate the new DLL. Allow the add-in to load if Revit asks.
+4. Go to **MM Tools → Model Opening → Open Guard**.
+5. The first installation starts **OFF**. Click once to turn it **ON**, then open your RVT model normally. Click again to turn it OFF. The choice is remembered after restarting Revit.
 
-Alternatively, from PowerShell in the repository root:
+> **What ON allows:** Open Guard can remove invalid annotation references and delete invalid dimensions when a known recovery rule matches and Revit permits the action. These changes affect the model in memory and may be saved when you later Save or Sync. Open Guard does not initiate Save or Sync itself. Unrecognized cases keep Revit's normal prompt.
 
-```powershell
-.\scripts\Build.ps1
-# Non-default Revit installation:
-.\scripts\Build.ps1 -RevitInstallPath 'D:\Autodesk\Revit 2024'
-```
+<details>
+<summary><strong>تعليمات سريعة بالعربية</strong></summary>
 
-Output: `RevitOpenGuard\bin\Release\net48\RevitOpenGuard.dll`.
+- حمّل ملف **Setup.exe** من رابط التحميل بالأعلى، وشغّله واختر إصدارات Revit المطلوبة ثم **Install**. التثبيت مسموح وRevit مفتوح ولا يحتاج Administrator.
+- لو بتحدّث نسخة قديمة محمّلة بالفعل، أعد تشغيل Revit بعد التثبيت.
+- من **MM Tools → Model Opening → Open Guard** فعّل الأداة؛ أول تثبيت يبدأ **OFF**، ثم افتح الموديل بالطريقة المعتادة.
+- وضع **ON** يسمح بإزالة مراجع أو حذف أبعاد متضررة حسب القواعد المعروفة وعندما يسمح Revit. التعديلات تكون داخل الموديل ويمكن حفظها لاحقًا عند Save/Sync؛ الأداة لا تحفظ أو تعمل Sync بنفسها.
+- الأداة تفحص تحديث قائمة الأخطاء عند كل تشغيل Revit. عند ظهور التنبيه اضغط **Update error catalog** لتطبيقه، أو **Close** للتأجيل.
 
-## Install / update
+</details>
 
-Close Revit, then run:
+## Keep the error catalog up to date
 
-```powershell
-.\scripts\Install.ps1
-# For a Debug build:
-.\scripts\Install.ps1 -Configuration Debug
-```
+The add-in checks in the background **every time Revit starts**, and checks daily during long sessions. It continues working with its saved catalog when offline.
 
-The script installs for the current user under `%APPDATA%\Autodesk\Revit\Addins\2024`, generates an absolute assembly path in the Application manifest, and leaves settings/logs intact. No administrator access is required. Restart Revit afterward. If corporate script policy blocks execution, use an approved PowerShell session or install the DLL and edited manifest manually; the scripts do not change machine execution policy.
+When newer rules are available, a Revit dialog appears with:
 
-Manual installation: copy `RevitOpenGuard.dll` into `%APPDATA%\Autodesk\Revit\Addins\2024\RevitOpenGuard\`, copy `deploy\RevitOpenGuard.addin` into the parent `2024` folder, and replace `__ASSEMBLY_PATH__` with the absolute DLL path. The template is not directly loadable until that placeholder is replaced. Keep only one installed Application manifest.
+- **Open Guard - Error catalog update** as the title.
+- The new catalog version and a description of the changes.
+- **Update error catalog** to apply the update, or **Close** to keep the current rules.
 
-`ToggleCommand` can bootstrap the service when run through Add-In Manager for a development session. Automatic startup on later Revit sessions requires the installed `.addin` manifest. Restart Revit when replacing a loaded DLL; hot reload and loading duplicate assembly copies are not supported.
+The check does **not** apply updates automatically. New rules take effect for subsequent model openings. You can also use **MM Tools → Model Opening → Error Catalog Updates → Check for updates** at any time.
 
-To uninstall:
+Catalog updates are digitally signed and verified by the add-in. Add-in/DLL updates are separate: download the newer installer from this page when a new application release is published. The Windows installer itself is currently unsigned.
 
-```powershell
-.\scripts\Uninstall.ps1
-```
+## What it handles
 
-Uninstall removes only this add-in's manifest/DLL/symbols. Settings and logs remain available.
-
-## Included handling
-
-| Opening case | Action |
+| Known opening problem | Recovery, when permitted by Revit |
 | --- | --- |
-| Dimension references no longer parallel | Remove Reference / `DetachElements` |
-| Cannot form radial dimension | Delete Dimension(s) / `DeleteElements` |
-| Dimension perpendicular to current view | Delete Dimension(s) / `DeleteElements` |
-| Recognized missing/lost/invalid annotation references | `DetachElements` if offered; known TaskDialog text uses the first recovery command |
-| Empty DWG Paper Space with Model Space fallback question | Yes |
-| Imported numerical data already truncated | Close (TaskDialog) / OK (standard message box) |
-| Recognized far-origin, coordinate, extents, off-axis/import warnings | OK when accepted by that dialog |
-| Recognized load/display/deleted-element notices | OK when accepted by that TaskDialog |
+| Invalid dimension references | Remove the broken reference or delete the affected dimensions, according to the matching rule |
+| Invalid radial or perpendicular dimensions | Delete the affected dimensions |
+| Recognized CAD import and coordinate warnings | Select the configured recovery/acknowledgment |
+| Recognized missing references and load/display notices | Apply the matching catalog action |
 
-See [the policy catalog](docs/HANDLING_CATALOG.md) for exact IDs, text-fallback limitations and source provenance. There is no generic auto-clicker, no `DeleteAllWarnings`, no attempt to bypass ACC permissions, and no NWC-export logic in this repository.
+The current catalog includes a narrow Revit 2024 English rule for **“One or more dimension references are or have become invalid.”**, using **Delete Dimension(s)** when Revit allows it. Download the current catalog after installation to receive rules added after the installer was built.
 
-## Settings and logs
+Open Guard acts **during RVT model opening**. Dialogs outside that scope, unsupported native windows, unknown failures and unrecoverable files may still require user action. It does not repair ACC login, permission, licensing or connectivity problems. ACC model-opening behavior has not yet been validated as a complete workflow.
 
-- State: `%APPDATA%\MoustafaMagdi\RevitOpenGuard\settings.xml`.
-- Audit logs: `%APPDATA%\MoustafaMagdi\RevitOpenGuard\logs\OpenGuard_*.log`.
+## Compatibility and validation
 
-Writes use a same-directory temporary file, flush and replace, with a `.bak` of the previous settings. A persistence failure is reported once on toggle; the new state still applies to the running session. Each Revit instance loads state at startup; changes are not broadcast to other running instances.
+| Revit versions | Release coverage |
+| --- | --- |
+| 2022, 2023, 2024 | Separate .NET Framework 4.8 builds |
+| 2025, 2026 | Separate .NET 8 builds |
+| 2027 | .NET 10 build |
 
-Logs record Revit version/build, opening correlation ID, model path, dialog/failure ID, selected resolution, affected IDs reported by Revit, unknown cases and final opening status. They contain no authentication tokens. Logs rotate around 5 MB and retention runs at startup/rotation (30 days / up to 60 older segments). No report window is shown on successful opening.
+Requires 64-bit Windows and the corresponding full Autodesk Revit installation. All six builds compile and pass installer packaging checks. Automatic catalog-update notification was confirmed by the user in **Revit 2024**. Full model-recovery validation across all six hosts, including the .NET 10 migration updates for Revit 2025/2026, remains incomplete. See the [validation checklist](docs/VALIDATION.md) for the tested scope and remaining checks.
 
-## Scope and limitations
+## Uninstall
 
-`DocumentOpening` starts the scope; `DocumentOpened` ends it, including failed/cancelled opening events. Normal `Idling` clears an orphaned scope as a fallback. Nested openings are tracked, family opens do not enable repair, and failures in documents that were already open are ignored.
+Close Revit, then remove **Revit Open Guard (2022-2027)** through **Windows Settings → Apps → Installed apps**. Your preferences, downloaded catalog and logs are preserved.
 
-Only dialogs/events exposed by Revit within that scope can be handled. A prompt before `DocumentOpening`, after `DocumentOpened`, a native window not reported by `DialogBoxShowing`, an unknown dialog or an unrecoverable file/authorization error can still block opening. English text policies are compatibility fallbacks; the three built-in dimension IDs do not depend on message language. Repeated failed recovery is not retried indefinitely.
+## Settings, troubleshooting and development
 
-This first version targets Revit 2024 only. It does not promise every model will open or repair a corrupt RVT. It is independent of ScheduledNwcExporter; using both handlers together requires coexistence testing, especially for the same failure. Start validation with Open Guard alone to attribute behavior correctly.
+Settings and logs are stored under `%APPDATA%\MoustafaMagdi\RevitOpenGuard`. Logs remain local and can include model paths; review them before sharing.
 
-## Validation status
+For a blocker, report the Revit year, a screenshot, and relevant log lines. For a missing update notification, include the local catalog version shown in **Error Catalog Updates**. Unknown messages should be investigated before adding a recovery rule.
 
-Source, project/manifest structure and policy/lifecycle paths have been reviewed. **This initial implementation has not been compiled against a local Revit 2024 installation or executed inside Revit in the authoring environment.** Existing exporter cases supplied the recovery rules; manual-opening integration remains to be validated on actual models. Follow [the validation checklist](docs/VALIDATION.md) before relying on unattended opening. No automated test/CI pipeline is added in this version.
+- [Build from source and technical details](docs/DEVELOPMENT.md)
+- [Installer details](installer/README.md)
+- [Publish signed error-catalog updates](docs/CATALOG_UPDATES.md)
+- [Handling catalog and provenance](docs/HANDLING_CATALOG.md)
+- [Validation checklist](docs/VALIDATION.md)
+
+Developed by **Mostafa Magdy**. This project is independent of Autodesk.
