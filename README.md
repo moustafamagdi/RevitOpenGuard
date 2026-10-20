@@ -4,19 +4,17 @@
 
 A Windows add-in with a simple **ON / OFF** button and an error catalog that can update independently of the add-in.
 
-## Download
-
-### [⬇ Download the Windows Installer](https://github.com/moustafamagdi/RevitOpenGuard/releases/latest/download/Revit-Open-Guard-2022-2027-Setup.exe)
+## Releases
 
 **Version 0.2.2 · Revit 2022–2027 · Per-user installation · No administrator required**
 
-[Release notes and all downloads](https://github.com/moustafamagdi/RevitOpenGuard/releases/latest) · [SHA-256 checksum](https://github.com/moustafamagdi/RevitOpenGuard/releases/latest/download/Revit-Open-Guard-2022-2027-Setup.exe.sha256)
+[Release information](https://github.com/moustafamagdi/RevitOpenGuard/releases)
 
-Download the **Setup.exe** above to install the add-in. You do not need Visual Studio, a development SDK, or the source-code ZIP.
+Installers are distributed only as assets attached to this repository’s GitHub Releases. Release information includes the supported version and asset checksums.
 
 ## Install and start using it
 
-1. Run **Revit-Open-Guard-2022-2027-Setup.exe**.
+1. Run the installer obtained from the GitHub release.
 2. Select your Revit versions and click **Install**. Detected installations are preselected. **Revit can stay open during installation.**
 3. Open Revit. If you are updating an add-in that is already loaded, restart Revit to activate the new DLL. Allow the add-in to load if Revit asks.
 4. Go to **MM Tools → Model Opening → Open Guard**.
@@ -27,7 +25,7 @@ Download the **Setup.exe** above to install the add-in. You do not need Visual S
 <details>
 <summary><strong>تعليمات سريعة بالعربية</strong></summary>
 
-- حمّل ملف **Setup.exe** من رابط التحميل بالأعلى، وشغّله واختر إصدارات Revit المطلوبة ثم **Install**. التثبيت مسموح وRevit مفتوح ولا يحتاج Administrator.
+- استخدم ملف التثبيت الموجود ضمن أصول الإصدار على GitHub Releases، وشغّله واختر إصدارات Revit المطلوبة ثم **Install**. التثبيت مسموح وRevit مفتوح ولا يحتاج Administrator.
 - لو بتحدّث نسخة قديمة محمّلة بالفعل، أعد تشغيل Revit بعد التثبيت.
 - من **MM Tools → Model Opening → Open Guard** فعّل الأداة؛ أول تثبيت يبدأ **OFF**، ثم افتح الموديل بالطريقة المعتادة.
 - وضع **ON** يسمح بإزالة مراجع أو حذف أبعاد متضررة حسب القواعد المعروفة وعندما يسمح Revit. التعديلات تكون داخل الموديل ويمكن حفظها لاحقًا عند Save/Sync؛ الأداة لا تحفظ أو تعمل Sync بنفسها.
@@ -47,7 +45,7 @@ When newer rules are available, a Revit dialog appears with:
 
 The check does **not** apply updates automatically. New rules take effect for subsequent model openings. You can also use **MM Tools → Model Opening → Error Catalog Updates → Check for updates** at any time.
 
-Catalog updates are digitally signed and verified by the add-in. Add-in/DLL updates are separate: download the newer installer from this page when a new application release is published. The Windows installer itself is currently unsigned.
+Catalog updates are digitally signed and verified by the add-in. Add-in/DLL updates are separate and are published only as GitHub Releases assets. The Windows installer itself is currently unsigned.
 
 ## What it handles
 
