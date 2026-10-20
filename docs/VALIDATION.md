@@ -22,3 +22,7 @@ The source project should not be distributed as a tested binary until steps 1-10
 ## Version 0.2.0 host matrix
 
 Repeat opening, ON/OFF and unknown-dialog checks in Revit 2022 through 2027, including 2025.5/2026.5. Check initial installation while Revit is open, catalog notification, manual download/apply, offline startup and rule snapshot stability during opening. Compile/package tests do not establish host runtime validation.
+
+## Host observation — 2026-10-20
+
+The user confirmed that the automatic catalog-update notification works with add-in 0.2.2 in Revit 2024. This validates notification delivery only; it does not complete model-recovery, ACC, other-year or 2025.5/2026.5 migration testing.
