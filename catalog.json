@@ -1,9 +1,19 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "minToolVersion": "0.2.0",
-  "notes": "Update notification test release. Recovery rules are unchanged from catalog 1.0.1. Choose Update error catalog to verify that catalog updates are detected and applied.",
+  "notes": "Adds a Revit 2024 English recovery rule for \"The Tap must be attached to duct.\" During model opening, Open Guard requests deletion of the affected elements only when Revit permits DeleteElements. Review the model before Save or Sync. Existing recovery rules are preserved.",
   "rules": [
+    {
+      "id": "Text.UnattachedDuctTap.DeleteElements",
+      "kind": "Failure",
+      "allText": [
+        "the tap must be attached to duct"
+      ],
+      "action": "DeleteElements",
+      "minRevit": 2024,
+      "maxRevit": 2024
+    },
     {
       "id": "Text.InvalidDimensionReferences.DeleteDimensions",
       "kind": "Failure",
