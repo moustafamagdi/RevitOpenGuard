@@ -14,6 +14,19 @@ namespace RevitOpenGuard.Policies
         public static FailurePolicy? Match(FailureMessageAccessor failure)
         {
             Guid id = failure.GetFailureDefinitionId().Guid;
+
+            // Compiled opening recovery, independent of the selected signed catalog version.
+            // Revit displays: "The Tap must be attached to duct." -> Delete Element(s).
+            // Match the Error definition only: never infer deletion from similar warning/pipe
+            // text. GuardService supplies the ON/opening scope, permitted-resolution check,
+            // per-opening/per-transaction repeat guards, and reported-element audit logging.
+            if (id == BuiltInFailures.ConnectorFailures.FittingMustBeOnDuct.Guid)
+            {
+                return failure.GetSeverity() == FailureSeverity.Error
+                    ? new FailurePolicy("Connector.FittingMustBeOnDuct", FailureResolutionType.DeleteElements)
+                    : null;
+            }
+
             string message = failure.GetDescriptionText() ?? "";
             foreach (var rule in CatalogStore.Current.Rules)
             {
