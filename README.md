@@ -6,11 +6,13 @@ A Windows add-in with a simple **ON / OFF** button and an error catalog that can
 
 ## Releases
 
-**Version 0.2.2 · Revit 2022–2027 · Per-user installation · No administrator required**
+**Version 0.2.3 · Revit 2022–2027 · Per-user installation · No administrator required**
 
 [Release information](https://github.com/moustafamagdi/RevitOpenGuard/releases)
 
 Installers are distributed only as assets attached to this repository’s GitHub Releases. Release information includes the supported version and asset checksums.
+
+Version 0.2.3 adds a fallback for the observed Revit 2024 invalid-dimension-reference failure: if Revit rejects deletion, Open Guard requests **Remove References** only when that resolution is available and permitted. The original deletion preference is preserved. Keep the error catalog updated (currently 1.0.3); install this application update and restart Revit to load the new DLL.
 
 ## Install and start using it
 

@@ -224,26 +224,29 @@ namespace RevitOpenGuard.Runtime
                             Observe(scope, "UnknownFailure", details + "; Available=" + DescribeResolutions(failure));
                             continue;
                         }
-                        bool available = policy.Resolution != FailureResolutionType.DetachElements
-                            || failure.HasResolutionOfType(policy.Resolution);
-                        if (!available || !accessor.IsFailureResolutionPermitted(failure, policy.Resolution))
+                        var selectedResolution = FailurePolicies.SelectResolution(policy,
+                            candidate => failure.HasResolutionOfType(candidate),
+                            candidate => accessor.IsFailureResolutionPermitted(failure, candidate));
+                        if (!selectedResolution.HasValue)
                         {
-                            Observe(scope, "ResolutionUnavailable", "Policy=" + policy.Id + "; " + details);
+                            Observe(scope, "ResolutionUnavailable", "Policy=" + policy.Id + "; " + details
+                                + "; Available=" + DescribeResolutions(failure));
                             continue;
                         }
-                        string key = document.GetHashCode() + "|" + definition + "|" + ids + "|" + policy.Resolution;
-                        if (accessor.GetAttemptedResolutionTypes(failure).Contains(policy.Resolution)
+                        var resolution = selectedResolution.Value;
+                        string key = document.GetHashCode() + "|" + definition + "|" + ids + "|" + resolution;
+                        if (accessor.GetAttemptedResolutionTypes(failure).Contains(resolution)
                             || !scope.AttemptedRepairs.Add(key))
                         {
                             Observe(scope, "ResolutionAlreadyAttempted", "Policy=" + policy.Id + "; " + details);
                             continue;
                         }
-                        failure.SetCurrentResolutionType(policy.Resolution);
+                        failure.SetCurrentResolutionType(resolution);
                         accessor.ResolveFailure(failure);
                         resolvedAny = true;
                         scope.RepairsApplied++;
                         _log.Write("INFO", "RecoveryRequested", "Policy=" + policy.Id + "; Resolution="
-                            + policy.Resolution + "; " + details, scope.Id, scope.Path);
+                            + resolution + "; Preferred=" + policy.Resolution + "; " + details, scope.Id, scope.Path);
                     }
                     catch (Exception ex)
                     {

@@ -26,3 +26,9 @@ Repeat opening, ON/OFF and unknown-dialog checks in Revit 2022 through 2027, inc
 ## Host observation — 2026-10-20
 
 The user confirmed that the automatic catalog-update notification works with add-in 0.2.2 in Revit 2024. This validates notification delivery only; it does not complete model-recovery, ACC, other-year or 2025.5/2026.5 migration testing.
+
+## Version 0.2.3 — dimension reference fallback
+
+Revit 2024 logs supplied on 2026-10-25 show failure `b44c8ba0-7a86-44c1-bbf1-2de8e2017266` with the same invalid-dimension-reference description: deletion was permitted for some affected dimensions and rejected for others. The accompanying screenshot offers Remove Reference(s). Version 0.2.3 tries DetachElements only for this observed failure in 2024, after a matching catalog DeleteElements policy is rejected; both resolution availability and permission are required for reference removal. Unknown failures, other years and other deletion policies gain no fallback. Existing opening scope, attempted-resolution guards and no automatic Save/Sync behavior are preserved.
+
+`tests-recovery` links the production matcher and selector with API stubs. Twelve checks cover deletion preference, permitted fallback, unavailable/forbidden removal, unknown ID/text, year restriction and existing detach policies. Run on net48, net8.0-windows and net10.0-windows. All six application builds and the installer self-test pass. These tests do not establish actual Revit recovery: reopen a copy of the reported model in Revit 2024, confirm RecoveryRequested reports DetachElements where deletion was unavailable, and review dimensions before saving. No live model was modified during development.
